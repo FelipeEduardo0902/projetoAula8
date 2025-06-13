@@ -1,0 +1,194 @@
+openapi: 3.0.0
+info:
+  title: API Aula 8
+  version: 1.0.0
+  description: Documentação Swagger da API de exemplo
+
+servers:
+  - url: http://localhost:3000
+
+paths:
+  /api/data:
+    get:
+      summary: Lista todos os dados ou retorna um dado pelo id (via query)
+      parameters:
+        - name: id
+          in: query
+          description: ID do dado a ser buscado (opcional)
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Retorna todos os dados ou o dado correspondente ao ID, se informado
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Dado'
+                  - $ref: '#/components/schemas/Dado'
+        '404':
+          description: ID não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErroId'
+
+    post:
+      summary: Cria novo dado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DadoInput'
+      responses:
+        '201':
+          description: Dado criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dado'
+        '400':
+          description: Campo "message" é obrigatório
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErroMessage'
+
+    put:
+      summary: Atualiza dado por ID (via query)
+      parameters:
+        - name: id
+          in: query
+          description: ID do dado a ser atualizado (obrigatório)
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DadoInput'
+      responses:
+        '200':
+          description: Dado atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dado'
+        '400':
+          description: ID na query é obrigatório ou campo "message" é obrigatório
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ErroIdQuery'
+                  - $ref: '#/components/schemas/ErroMessage'
+        '404':
+          description: ID não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErroId'
+
+    patch:
+      summary: Atualiza parcialmente o dado (via query)
+      parameters:
+        - name: id
+          in: query
+          description: ID do dado a ser alterado (obrigatório)
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DadoInput'
+      responses:
+        '200':
+          description: Dado alterado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dado'
+        '400':
+          description: ID na query é obrigatório ou campo "message" é obrigatório
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ErroIdQuery'
+                  - $ref: '#/components/schemas/ErroMessage'
+        '404':
+          description: ID não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErroId'
+
+    delete:
+      summary: Remove dado por ID (via query)
+      parameters:
+        - name: id
+          in: query
+          description: ID do dado a ser removido (obrigatório)
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Dado removido com sucesso (sem conteúdo)
+        '400':
+          description: ID na query é obrigatório
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErroIdQuery'
+        '404':
+          description: ID não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErroId'
+
+components:
+  schemas:
+    Dado:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        message:
+          type: string
+          example: Primeira mensagem
+    DadoInput:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Mensagem qualquer
+    ErroId:
+      type: object
+      properties:
+        error:
+          type: string
+          example: ID não encontrado
+    ErroIdQuery:
+      type: object
+      properties:
+        error:
+          type: string
+          example: ID na query é obrigatório
+    ErroMessage:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Campo "message" é obrigatório
