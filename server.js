@@ -1,11 +1,14 @@
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
+const path = require('path');
 const app = express();
-const PORT = 3000;
 
-// Carrega o arquivo YAML do Swagger
-const swaggerDocument = YAML.load('./swagger.yaml');
+// Usa a porta da Azure se existir, senão 3000
+const PORT = process.env.PORT || 3000;
+
+// Carrega o arquivo YAML do Swagger, caminho seguro para cloud
+const swaggerDocument = YAML.load(path.join(__dirname, 'swagger.yaml'));
 
 app.use(express.json());
 app.use(express.static('public'));
@@ -82,7 +85,6 @@ app.use((req, res) => {
 
 // Sobe o servidor
 app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
-  console.log('Swagger docs em http://localhost:3000/api-docs');
+  console.log(`Servidor rodando na porta ${PORT}`);
+  console.log(`Swagger docs em /api-docs`);
 });
-
